@@ -1,9 +1,11 @@
 ﻿using System;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.Google;
+using Microsoft.Owin.Security.OpenIdConnect;
 using Owin;
 using OIDCPlay.Models;
 
@@ -63,6 +65,30 @@ namespace OIDCPlay
             //    ClientId = "",
             //    ClientSecret = ""
             //});
+
+            app.UseOpenIdConnectAuthentication(new OpenIdConnectAuthenticationOptions
+            {
+                Caption = "Gugle",
+                AuthenticationType = "Gugle",
+                ClientId = "1096301616546-edbl612881t7rkpljp3qa3juminskulo.apps.googleusercontent.com",
+                ClientSecret = "gOKwmN181CgsnQQDWqTSZjFs",
+                Authority = "https://accounts.google.com/",
+                ResponseType = "id_token",
+                Scope = "openid email",
+                UseTokenLifetime = false,
+                RedirectUri = "http://localhost:56440/signin-google"
+            });
         }
     }
 }
+/*
+ {
+  "Google-ClientId": "1096301616546-edbl612881t7rkpljp3qa3juminskulo.apps.googleusercontent.com",
+  "Google-ClientSecret": "gOKwmN181CgsnQQDWqTSZjFs",
+ 
+
+    https://accounts.google.com/
+    https://accounts.google.com/.well-known/openid-configuration
+
+}
+ */
