@@ -83,7 +83,7 @@ namespace OIDCPlay
                 ResponseType = "id_token",
                 Scope = "openid email",
                 UseTokenLifetime = false,
-                RedirectUri = "http://localhost:56440/signin-google"
+                RedirectUri = "https://localhost:44369/signin-google"
             });
         }
     }
