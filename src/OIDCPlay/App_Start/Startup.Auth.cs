@@ -75,8 +75,8 @@ namespace OIDCPlay
 
             app.UseOpenIdConnectAuthentication(new OpenIdConnectAuthenticationOptions
             {
-                Caption = "Gugle",
-                AuthenticationType = "Gugle",
+                Caption = "Google",
+                AuthenticationType = "Google",
                 ClientId = "1096301616546-edbl612881t7rkpljp3qa3juminskulo.apps.googleusercontent.com",
                 ClientSecret = "gOKwmN181CgsnQQDWqTSZjFs",
                 Authority = "https://accounts.google.com/",
