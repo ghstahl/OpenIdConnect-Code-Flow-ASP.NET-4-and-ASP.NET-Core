@@ -84,9 +84,6 @@
     <Reference Include="Microsoft.IdentityModel.Tokens, Version=5.2.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.IdentityModel.Tokens.5.2.4\lib\net451\Microsoft.IdentityModel.Tokens.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Owin.Security.OpenIdConnect, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Owin.Security.OpenIdConnect.4.0.0\lib\net451\Microsoft.Owin.Security.OpenIdConnect.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -329,6 +326,10 @@
     <ProjectReference Include="..\InMemoryIdenity.ForSingleExternalAuthOnly\InMemoryIdenity.ForSingleExternalAuthOnly.csproj">
       <Project>{7EA1AA53-13BB-4162-8392-41AE64DD68F8}</Project>
       <Name>InMemoryIdenity.ForSingleExternalAuthOnly</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\P7.Microsoft.Owin.Security.OpenIdConnect\P7.Microsoft.Owin.Security.OpenIdConnect.csproj">
+      <Project>{aa80b4a3-c885-4a7e-af1a-fc3e89611988}</Project>
+      <Name>P7.Microsoft.Owin.Security.OpenIdConnect</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
