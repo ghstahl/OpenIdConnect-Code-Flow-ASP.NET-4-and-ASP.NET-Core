@@ -6,7 +6,7 @@ using System.Web.Mvc;
 
 namespace OIDCPlay.Controllers
 {
-    [Authorize]
+    [CustomAuthorize]
     public class SecureController : Controller
     {
         // GET: Secure
