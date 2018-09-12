@@ -83,7 +83,20 @@ namespace OIDCPlay
                 ResponseType = "id_token",
                 Scope = "openid email",
                 UseTokenLifetime = false,
-                RedirectUri = "https://localhost:44369/signin-google"
+                RedirectUri = "https://p7core.127.0.0.1.xip.io:44344/signin-google"
+            });
+            app.UseOpenIdConnectAuthentication(new OpenIdConnectAuthenticationOptions
+            {
+                Caption = "Norton",
+                AuthenticationType = "Norton",
+                ClientId = "signin-norton/p7core44344/xip.io",
+                ClientSecret = "{{put secret here}}",
+                Authority = "https://login-int.norton.com/sso/oidc1/token",
+                ResponseType = OpenIdConnectResponseType.Code,
+
+                Scope = "openid profile email open_web_session",
+                UseTokenLifetime = false,
+                RedirectUri = "https://p7core.127.0.0.1.xip.io:44344/signin-norton"
             });
         }
     }

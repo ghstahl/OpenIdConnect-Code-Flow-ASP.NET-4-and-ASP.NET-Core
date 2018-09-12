@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InMemoryIdenity.ForSingleEx
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "P7.Microsoft.Owin.Security.OpenIdConnect", "P7.Microsoft.Owin.Security.OpenIdConnect\P7.Microsoft.Owin.Security.OpenIdConnect.csproj", "{AA80B4A3-C885-4A7E-AF1A-FC3E89611988}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OIDCPlay.Core", "OIDCPlay.Core\OIDCPlay.Core.csproj", "{5CFF5236-317D-4F77-BD0B-A5946D2AAEAB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{AA80B4A3-C885-4A7E-AF1A-FC3E89611988}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AA80B4A3-C885-4A7E-AF1A-FC3E89611988}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AA80B4A3-C885-4A7E-AF1A-FC3E89611988}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5CFF5236-317D-4F77-BD0B-A5946D2AAEAB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5CFF5236-317D-4F77-BD0B-A5946D2AAEAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5CFF5236-317D-4F77-BD0B-A5946D2AAEAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5CFF5236-317D-4F77-BD0B-A5946D2AAEAB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
