@@ -32,3 +32,15 @@ So no linking external accounts to yours.
         </bindings>
       </site>
 ```
+
+I have whitelisted the following urls in;  
+
+use the following urls to test both Google and Norton.   
+
+Asp.Net 4 Version:     
+https://p7core.127.0.0.1.xip.io:44344
+
+Asp.Net Core 2.1 Version:  
+https://p7core.127.0.0.1.xip.io:44311
+
+
