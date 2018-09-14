@@ -11,14 +11,24 @@ So no linking external accounts to yours.
 
 [using-a-custom-hostname-with-iis-express-with-visual-studio-2015-vs2015](http://10printhello.com/using-a-custom-hostname-with-iis-express-with-visual-studio-2015-vs2015/)  
 ```
-<site name="OIDCPlay(2)" id="5">
-    <application path="/" applicationPool="Clr4IntegratedAppPool">
-        <virtualDirectory path="/" physicalPath="H:\Github\ghstahl\asp.net.4.play\src\OIDCPlay" />
-    </application>
-    <bindings>
-        <binding protocol="https" bindingInformation="*:44344:p7core.127.0.0.1.xip.io" />
-        <binding protocol="https" bindingInformation="*:44344:localhost" />
-        <binding protocol="http" bindingInformation="*:56440:localhost" />
-    </bindings>
-</site>
+<site name="OIDCPlay(1)" id="2">
+        <application path="/" applicationPool="Clr4IntegratedAppPool">
+          <virtualDirectory path="/" physicalPath="H:\github\ghstahl2\asp.net.4.play\src\OIDCPlay" />
+        </application>
+        <bindings>
+          <binding protocol="https" bindingInformation="*:44344:p7core.127.0.0.1.xip.io" />
+          <binding protocol="https" bindingInformation="*:44344:localhost" />
+          <binding protocol="http" bindingInformation="*:56440:localhost" />
+        </bindings>
+      </site>
+      <site name="OIDCPlay.Core" id="3">
+        <application path="/" applicationPool="Clr4IntegratedAppPool">
+          <virtualDirectory path="/" physicalPath="H:\github\ghstahl2\asp.net.4.play\src\OIDCPlay.Core" />
+        </application>
+        <bindings>
+          <binding protocol="https" bindingInformation="*:44311:p7core.127.0.0.1.xip.io" />
+          <binding protocol="https" bindingInformation="*:44311:localhost" />
+          <binding protocol="http" bindingInformation="*:32247:localhost" />
+        </bindings>
+      </site>
 ```
