@@ -1,11 +1,16 @@
 ﻿using System;
-using InMemoryIdenity.ForSingleExternalAuthOnly;
+using System.Collections.Generic;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Threading.Tasks;
+ using InMemoryIdenity.ForSingleExternalAuthOnly;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.Owin;
+using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
-using Microsoft.Owin.Security.Google;
 using Microsoft.Owin.Security.OpenIdConnect;
 using Owin;
 using OIDCPlay.Models;
@@ -14,6 +19,7 @@ namespace OIDCPlay
 {
     public partial class Startup
     {
+ 
         // For more information on configuring authentication, please visit https://go.microsoft.com/fwlink/?LinkId=301864
         public void ConfigureAuth(IAppBuilder app)
         {
@@ -80,10 +86,17 @@ namespace OIDCPlay
                 ClientId = "1096301616546-edbl612881t7rkpljp3qa3juminskulo.apps.googleusercontent.com",
                 ClientSecret = "gOKwmN181CgsnQQDWqTSZjFs",
                 Authority = "https://accounts.google.com/",
-                ResponseType = "id_token",
+                ResponseType = OpenIdConnectResponseType.Code,
                 Scope = "openid email",
                 UseTokenLifetime = false,
-                RedirectUri = "https://p7core.127.0.0.1.xip.io:44344/signin-google"
+                RedirectUri = "https://p7core.127.0.0.1.xip.io:44344/signin-google",
+                Notifications = new OpenIdConnectAuthenticationNotifications()
+                {
+                    AuthorizationCodeRedeemed= async n =>
+                    {
+                        var ticket = n.AuthenticationTicket;
+                    }
+                }
             });
             app.UseOpenIdConnectAuthentication(new OpenIdConnectAuthenticationOptions
             {
@@ -93,10 +106,20 @@ namespace OIDCPlay
                 ClientSecret = "{{put secret here}}",
                 Authority = "https://login-int.norton.com/sso/oidc1/token",
                 ResponseType = OpenIdConnectResponseType.Code,
-
+                TokenValidationParameters = new TokenValidationParameters()
+                {
+                    ValidateLifetime = false
+                },
                 Scope = "openid profile email open_web_session",
                 UseTokenLifetime = false,
-                RedirectUri = "https://p7core.127.0.0.1.xip.io:44344/signin-norton"
+                RedirectUri = "https://p7core.127.0.0.1.xip.io:44344/signin-norton",
+                Notifications = new OpenIdConnectAuthenticationNotifications()
+                {
+                    AuthorizationCodeRedeemed = async n =>
+                    {
+                        var ticket = n.AuthenticationTicket;
+                    }
+                }
             });
         }
     }
