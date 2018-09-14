@@ -1,4 +1,4 @@
-# asp.net.4.play
+# OpenIdConnect-Code-Flow-ASP.NET-4-and-ASP.NET-Core
 
 [Download and Install 4.7.2 Developer Pack](https://www.microsoft.com/net/download/visual-studio-sdks)
 
