@@ -11,12 +11,12 @@ namespace Microsoft.Owin.Security.Notifications
     /// <summary>
     /// This Notification can be used to be informed when an 'AuthorizationCode' is received over the OpenIdConnect protocol.
     /// </summary>
-    public class AuthorizationCodeReceivedNotification : BaseNotification<OpenIdConnectAuthenticationOptions>
+    public class AuthorizationCodeRedeemedNotification : BaseNotification<OpenIdConnectAuthenticationOptions>
     {
         /// <summary>
-        /// Creates a <see cref="AuthorizationCodeReceivedNotification"/>
+        /// Creates a <see cref="AuthorizationCodeRedeemedNotification"/>
         /// </summary>
-        public AuthorizationCodeReceivedNotification(IOwinContext context, OpenIdConnectAuthenticationOptions options)
+        public AuthorizationCodeRedeemedNotification(IOwinContext context, OpenIdConnectAuthenticationOptions options)
             : base(context, options)
         { 
         }
@@ -25,11 +25,6 @@ namespace Microsoft.Owin.Security.Notifications
         /// Gets or sets the <see cref="AuthenticationTicket"/>
         /// </summary>
         public AuthenticationTicket AuthenticationTicket { get; set; }
-
-        /// <summary>
-        /// Gets or sets the 'code'.
-        /// </summary>
-        public string Code { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="JwtSecurityToken"/> that was received in the id_token + code OpenIdConnectRequest.

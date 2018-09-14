@@ -34,8 +34,9 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         /// <summary>
         /// Invoked after security token validation if an authorization code is present in the protocol message.
         /// </summary>
-        public Func<AuthorizationCodeReceivedNotification, Task> AuthorizationCodeReceived { get; set; }
-
+        public Func<AuthorizationCodeRedeemedNotification, Task> AuthorizationCodeReceived { get; set; }
+      
+        
         /// <summary>
         /// Invoked when a protocol message is first received.
         /// </summary>
