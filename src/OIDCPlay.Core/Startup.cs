@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
@@ -54,33 +57,214 @@ namespace OIDCPlay.Core
                     options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
                     options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
                 }).AddCookie();
-            foreach (var record in oAuth2SchemeRecords)
-            {
-                var scheme = record.Scheme;
-                authenticationBuilder.AddOpenIdConnect(scheme, scheme, options =>
-                {
-                    options.Authority = record.Authority;
-                    options.CallbackPath = record.CallbackPath;
-                    options.RequireHttpsMetadata = false;
 
-                    options.ClientId = record.ClientId;
-                    options.ClientSecret = record.ClientSecret;
-                    options.SaveTokens = true;
-                    options.Events.OnRedirectToIdentityProvider = async n =>
+            if (!(string.IsNullOrEmpty(Configuration["Norton-ClientId"]) ||
+                 string.IsNullOrEmpty(Configuration["Norton-ClientSecret"])))
+            {
+                authenticationBuilder.AddOpenIdConnect(NortonDefaults.AuthenticationScheme, NortonDefaults.DisplayName,
+                    o =>
                     {
-                        if (n.ProtocolMessage.RequestType == OpenIdConnectRequestType.Authentication)
+                        var openIdConnectOptions = new NortonOpenIdConnectOptions();
+                        o.CallbackPath = Configuration["oauth2:norton:callbackPath"];
+
+                        o.ClientId = Configuration["Norton-ClientId-Two"];
+                        o.ClientSecret = Configuration["Norton-ClientSecret-Two"];
+
+                        o.Authority = Configuration["oauth2:norton:authority"];
+                        o.ResponseType = openIdConnectOptions.ResponseType;
+                        o.GetClaimsFromUserInfoEndpoint = openIdConnectOptions.GetClaimsFromUserInfoEndpoint;
+                        o.SaveTokens = openIdConnectOptions.SaveTokens;
+                        o.Scope.Add("offline_access");
+                        o.Events = new OpenIdConnectEvents()
                         {
-                            n.ProtocolMessage.AcrValues = "v1=google";
-                        }
-                    };
-                    options.Events.OnRemoteFailure = context =>
-                    {
-                        context.Response.Redirect("/");
-                        context.HandleResponse();
-                        return Task.CompletedTask;
-                    };
-                });
+                            OnMessageReceived = (context) =>
+                            {
+                                if (context.ProtocolMessage.Error != null)
+                                {
+                                    var errorUrl = context.HttpContext.Request.Cookies["x-errorUrl"];
+                                    CookieOptions option = new CookieOptions { Expires = DateTime.Now };
+
+                                    context.HttpContext.Response.Cookies.Append("x-errorUrl", "", option);
+                                    if (string.IsNullOrEmpty(errorUrl))
+                                    {
+                                        errorUrl = "/account/ErrorJson";
+                                    }
+
+                                    context.Response.Redirect($"{errorUrl}?error={context.ProtocolMessage.Error}");
+
+                                    context.HandleResponse();
+                                }
+                                return Task.FromResult(0);
+
+                            },
+                            OnAuthenticationFailed = (context) =>
+                            {
+                                return Task.FromResult(0);
+                            },
+                            OnRedirectToIdentityProvider = (context) =>
+                            {
+
+                                var acrValues = context.ProtocolMessage.AcrValues;
+                                context.ProtocolMessage.Scope += " open_web_session";
+                                if (context.HttpContext.User.Identity.IsAuthenticated)
+                                {
+                                    // assuming a relogin trigger, so we will make the user relogin on the IDP
+                                    context.ProtocolMessage.Prompt = "login";
+                                }
+                                //  
+
+                                var query = from item in context.Request.Query
+                                            where string.Compare(item.Key, "prompt", true) == 0
+                                            select item.Value;
+                                if (query.Any())
+                                {
+                                    var prompt = query.FirstOrDefault();
+                                    context.ProtocolMessage.Prompt = prompt;
+                                }
+
+                                query = from item in context.Request.Query
+                                        where string.Compare(item.Key, "errorUrl", true) == 0
+                                        select item.Value;
+                                if (query.Any())
+                                {
+                                    var errorUrl = query.FirstOrDefault();
+                                    context.Response.Cookies.Append("x-errorUrl", errorUrl);
+                                }
+
+
+                                return Task.FromResult(0);
+                            },
+                            OnTicketReceived = (context) =>
+                            {
+
+                                ClaimsIdentity identity = (ClaimsIdentity)context.Principal.Identity;
+                                var givenName = identity.FindFirst(ClaimTypes.GivenName);
+                                var familyName = identity.FindFirst(ClaimTypes.Surname);
+                                var nameIdentifier = identity.FindFirst(ClaimTypes.NameIdentifier);
+                                var userId = identity.FindFirst("UserId");
+
+
+                                var claimsToKeep = new List<Claim> { givenName, familyName, nameIdentifier, userId };
+                                claimsToKeep.Add(new Claim("DisplayName", $"{givenName.Value} {familyName.Value}"));
+                                var newIdentity = new ClaimsIdentity(claimsToKeep, identity.AuthenticationType);
+
+                                context.Principal = new ClaimsPrincipal(newIdentity);
+                                return Task.CompletedTask;
+                            }
+                        };
+
+
+                    });
             }
+            if (!(string.IsNullOrEmpty(Configuration["Google-ClientId"]) ||
+                  string.IsNullOrEmpty(Configuration["Google-ClientSecret"])))
+            {
+                authenticationBuilder.AddOpenIdConnect(GoogleDefaults.AuthenticationScheme, GoogleDefaults.DisplayName,
+                      o =>
+                      {
+                          var openIdConnectOptions = new GoogleOpenIdConnectOptions();
+                          o.CallbackPath = Configuration["oauth2:google:callbackPath"];
+
+                          o.ClientId = Configuration["Google-ClientId"];
+                          o.ClientSecret = Configuration["Google-ClientSecret"];
+
+                          o.Authority = Configuration["oauth2:google:authority"];
+                          o.ResponseType = openIdConnectOptions.ResponseType;
+                          o.GetClaimsFromUserInfoEndpoint = openIdConnectOptions.GetClaimsFromUserInfoEndpoint;
+                          o.SaveTokens = openIdConnectOptions.SaveTokens;
+
+                          o.Events = new OpenIdConnectEvents()
+                          {
+                              OnMessageReceived = (context) =>
+                              {
+                                  if (context.ProtocolMessage.Error != null)
+                                  {
+                                      var errorUrl = context.HttpContext.Request.Cookies["x-errorUrl"];
+                                      CookieOptions option = new CookieOptions { Expires = DateTime.Now };
+
+                                      context.HttpContext.Response.Cookies.Append("x-errorUrl", "", option);
+                                      if (string.IsNullOrEmpty(errorUrl))
+                                      {
+                                          errorUrl = "/account/ErrorJson";
+                                      }
+
+                                      context.Response.Redirect($"{errorUrl}?error={context.ProtocolMessage.Error}");
+
+                                      context.HandleResponse();
+                                  }
+                                  return Task.FromResult(0);
+
+                              },
+                              OnAuthenticationFailed = (context) =>
+                              {
+                                  return Task.FromResult(0);
+                              },
+                              OnRedirectToIdentityProvider = (context) =>
+                              {
+                                  if (context.ProtocolMessage.RequestType == OpenIdConnectRequestType.Authentication)
+                                  {
+                                      context.ProtocolMessage.AcrValues = "v1=some-value";
+                                  }
+                                  var query = from item in context.Request.Query
+                                              where string.Compare(item.Key, "prompt", true) == 0
+                                              select item.Value;
+                                  if (query.Any())
+                                  {
+                                      var prompt = query.FirstOrDefault();
+                                      context.ProtocolMessage.Prompt = prompt;
+                                  }
+
+                                  query = from item in context.Request.Query
+                                          where string.Compare(item.Key, "errorUrl", true) == 0
+                                          select item.Value;
+                                  if (query.Any())
+                                  {
+                                      var errorUrl = query.FirstOrDefault();
+                                      context.Response.Cookies.Append("x-errorUrl", errorUrl);
+                                  }
+
+
+                                  return Task.FromResult(0);
+                              },
+                              OnTicketReceived = (context) =>
+                              {
+
+                                  ClaimsIdentity identity = (ClaimsIdentity)context.Principal.Identity;
+                                  var query = from claim in context.Principal.Claims
+                                              where claim.Type == ClaimTypes.Name || claim.Type == "name"
+                                              select claim;
+                                  var nameClaim = query.FirstOrDefault();
+                                  var nameIdentifier = identity.FindFirst(ClaimTypes.NameIdentifier);
+
+
+                                  var claimsToKeep =
+                                      new List<Claim>
+                                      {
+                                        nameClaim,
+                                        nameIdentifier,
+                                        new Claim("DisplayName", nameClaim.Value),
+                                        new Claim("UserId", nameIdentifier.Value)
+                                      };
+
+                                  var newIdentity = new ClaimsIdentity(claimsToKeep, identity.AuthenticationType);
+
+                                  context.Principal = new ClaimsPrincipal(newIdentity);
+                                  return Task.CompletedTask;
+
+                              },
+                              OnUserInformationReceived = (context) =>
+                              {
+                                  return Task.FromResult(0);
+
+                              }
+
+                          };
+
+                      });
+            }
+
+
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
