@@ -19,7 +19,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         public OpenIdConnectAuthenticationNotifications()
         {
             AuthenticationFailed = notification => Task.FromResult(0);
-            AuthorizationCodeReceived = notification => Task.FromResult(0);
+            AuthorizationCodeRedeemed = notification => Task.FromResult(0);
             MessageReceived = notification => Task.FromResult(0);
             SecurityTokenReceived = notification => Task.FromResult(0);
             SecurityTokenValidated = notification => Task.FromResult(0);
@@ -34,7 +34,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
         /// <summary>
         /// Invoked after security token validation if an authorization code is present in the protocol message.
         /// </summary>
-        public Func<AuthorizationCodeRedeemedNotification, Task> AuthorizationCodeReceived { get; set; }
+        public Func<AuthorizationCodeRedeemedNotification, Task> AuthorizationCodeRedeemed { get; set; }
       
         
         /// <summary>

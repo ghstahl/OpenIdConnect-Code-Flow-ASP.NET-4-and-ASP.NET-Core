@@ -489,7 +489,7 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                 {
                     SaveTokens(ticket.Properties, openIdConnectMessage);
 
-                    var authorizationCodeReceivedNotification =
+                    var authorizationCodeRedeemedNotification =
                         new AuthorizationCodeRedeemedNotification(Context, Options)
                         {
                             AuthenticationTicket = ticket,
@@ -502,19 +502,19 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                                         OpenIdConnectAuthenticationDefaults.RedirectUriUsedForCodeKey]
                                     : string.Empty,
                         };
-                    await Options.Notifications.AuthorizationCodeReceived(authorizationCodeReceivedNotification);
-                    if (authorizationCodeReceivedNotification.HandledResponse)
+                    await Options.Notifications.AuthorizationCodeRedeemed(authorizationCodeRedeemedNotification);
+                    if (authorizationCodeRedeemedNotification.HandledResponse)
                     {
                         return GetHandledResponseTicket();
                     }
 
-                    if (authorizationCodeReceivedNotification.Skipped)
+                    if (authorizationCodeRedeemedNotification.Skipped)
                     {
                         return null;
                     }
 
                     // Flow possible changes
-                    ticket = authorizationCodeReceivedNotification.AuthenticationTicket;
+                    ticket = authorizationCodeRedeemedNotification.AuthenticationTicket;
                 }
 
                 return ticket;
