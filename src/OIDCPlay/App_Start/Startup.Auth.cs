@@ -86,6 +86,7 @@ namespace OIDCPlay
                 ClientId = "1096301616546-edbl612881t7rkpljp3qa3juminskulo.apps.googleusercontent.com",
                 ClientSecret = "gOKwmN181CgsnQQDWqTSZjFs",
                 Authority = "https://accounts.google.com/",
+//                ResponseType = OpenIdConnectResponseType.IdToken,// Works as well, just no access_tokens  
                 ResponseType = OpenIdConnectResponseType.Code,
                 Scope = "openid email",
                 UseTokenLifetime = false,
@@ -95,6 +96,10 @@ namespace OIDCPlay
                     AuthorizationCodeRedeemed= async n =>
                     {
                         var ticket = n.AuthenticationTicket;
+                        // store tokens for later use
+                        var idToken = ticket.Properties.GetTokenValue("id_token");
+                        var accessToken = ticket.Properties.GetTokenValue("access_token");
+                        var refreshToken = ticket.Properties.GetTokenValue("refresh_token");
                     }
                 }
             });
@@ -118,6 +123,10 @@ namespace OIDCPlay
                     AuthorizationCodeRedeemed = async n =>
                     {
                         var ticket = n.AuthenticationTicket;
+                        // store tokens for later use
+                        var idToken = ticket.Properties.GetTokenValue("id_token");
+                        var accessToken = ticket.Properties.GetTokenValue("access_token");
+                        var refreshToken = ticket.Properties.GetTokenValue("refresh_token");
                     }
                 }
             });
