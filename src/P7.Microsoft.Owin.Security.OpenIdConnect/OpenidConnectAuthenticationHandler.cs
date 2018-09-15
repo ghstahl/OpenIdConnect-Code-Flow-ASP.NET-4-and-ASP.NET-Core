@@ -349,17 +349,8 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                             openIdConnectMessage.ErrorUri ?? string.Empty));
                 }
 
-                // code is only accepted with id_token, in this version, hence check for code is inside this if
-                // OpenIdConnect protocol allows a Code to be received without the id_token
-                /*
-                if (string.IsNullOrWhiteSpace(openIdConnectMessage.IdToken))
-                {
-                    _logger.WriteWarning("The id_token is missing.");
-                    return null;
-                }
-                */
-                var discoverCacheContainer = await FetchGenericDiscoverCacheContainerAsync(Options);
-
+ 
+                
                 var securityTokenReceivedNotification =
                     new SecurityTokenReceivedNotification<OpenIdConnectMessage, OpenIdConnectAuthenticationOptions>(
                         Context, Options)
@@ -391,20 +382,45 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     ? _configuration.SigningKeys
                     : tvp.IssuerSigningKeys.Concat<SecurityKey>(_configuration.SigningKeys));
 
-                var disco = await discoverCacheContainer.DiscoveryCache.GetAsync();
-                var tokenClient = await GetTokenClientAsync(Options);
+                var idToken = "";
+                var accessToken = "";
+                var refeshToken = "";
 
-                var tokenResponse = await tokenClient.RequestAuthorizationCodeAsync(
-                    openIdConnectMessage.Code, Options.RedirectUri);
-
-                if (tokenResponse.IsError)
+                if (openIdConnectMessage.Code != null)
                 {
-                    throw new Exception(tokenResponse.Error);
+                    var discoverCacheContainer = await FetchGenericDiscoverCacheContainerAsync(Options);
+                    var disco = await discoverCacheContainer.DiscoveryCache.GetAsync();
+                    var tokenClient = await GetTokenClientAsync(Options);
+
+                    var tokenResponse = await tokenClient.RequestAuthorizationCodeAsync(
+                        openIdConnectMessage.Code, Options.RedirectUri);
+
+                    if (tokenResponse.IsError)
+                    {
+                        throw new Exception(tokenResponse.Error);
+                    }
+
+                    idToken = tokenResponse.IdentityToken;
+                    accessToken = tokenResponse.AccessToken;
+                    refeshToken = tokenResponse.RefreshToken;
+                }
+
+                if (string.IsNullOrEmpty(idToken) && string.IsNullOrWhiteSpace(openIdConnectMessage.IdToken))
+                {
+                    // Either the backchannel failed us or a CODE flow was NOT asked for and we are in the legacy flow
+                    _logger.WriteWarning("The id_token is missing.");
+                    return null;
+                }
+
+                // this is to cover the legacy cases where only id_token flow is asked for.
+                if (string.IsNullOrEmpty(idToken))
+                {
+                    idToken = openIdConnectMessage.IdToken;
                 }
 
                 SecurityToken validatedToken;
                 ClaimsPrincipal principal = Options.SecurityTokenValidator.ValidateToken(
-                    tokenResponse.IdentityToken, tvp, out validatedToken);
+                    idToken, tvp, out validatedToken);
                 ClaimsIdentity claimsIdentity = principal.Identity as ClaimsIdentity;
 
                 // claims principal could have changed claim values, use bits received on wire for validation.
@@ -482,9 +498,9 @@ namespace Microsoft.Owin.Security.OpenIdConnect
                     ValidatedIdToken = jwt,
                     Nonce = nonce
                 });
-                openIdConnectMessage.RefreshToken = tokenResponse.RefreshToken;
-                openIdConnectMessage.AccessToken = tokenResponse.AccessToken;
-                openIdConnectMessage.IdToken = tokenResponse.IdentityToken;
+                openIdConnectMessage.RefreshToken = refeshToken;
+                openIdConnectMessage.AccessToken = accessToken;
+                openIdConnectMessage.IdToken = idToken;
                 if (openIdConnectMessage.Code != null)
                 {
                     SaveTokens(ticket.Properties, openIdConnectMessage);
