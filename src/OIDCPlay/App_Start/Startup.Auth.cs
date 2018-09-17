@@ -127,6 +127,18 @@ namespace OIDCPlay
                         var idToken = ticket.Properties.GetTokenValue("id_token");
                         var accessToken = ticket.Properties.GetTokenValue("access_token");
                         var refreshToken = ticket.Properties.GetTokenValue("refresh_token");
+                    },
+                    RedirectToIdentityProvider = async n =>
+                    {
+                        // read cookie here to get hint of what acr value to send.
+                        var cookies = n.Request.Cookies;
+                       
+                        if (n.ProtocolMessage.RequestType == OpenIdConnectRequestType.Authentication)
+                        {
+                            n.ProtocolMessage.AcrValues = "https://login.norton.com/sso/saml_2.0_profile/nosignup";
+                        }
+
+                       
                     }
                 }
             });
