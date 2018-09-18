@@ -11,6 +11,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "P7.Microsoft.Owin.Security.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OIDCPlay.Core", "OIDCPlay.Core\OIDCPlay.Core.csproj", "{5CFF5236-317D-4F77-BD0B-A5946D2AAEAB}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "aspnet", "aspnet", "{3826ACF2-CD64-483E-94E3-077AA7BD6CE7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Security", "Security", "{5B436124-4020-4F0E-9771-8F2728906494}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2.1.1", "2.1.1", "{CA946474-BF52-4FE8-89E7-BD2185D3CF5C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "P7.Microsoft.AspNetCore.Authentication.OpenIdConnect", "P7.Microsoft.AspNetCore.Authentication.OpenIdConnect\P7.Microsoft.AspNetCore.Authentication.OpenIdConnect.csproj", "{1802CCF4-AEAA-4B9F-81EF-7728103FB235}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,9 +41,18 @@ Global
 		{5CFF5236-317D-4F77-BD0B-A5946D2AAEAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5CFF5236-317D-4F77-BD0B-A5946D2AAEAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5CFF5236-317D-4F77-BD0B-A5946D2AAEAB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1802CCF4-AEAA-4B9F-81EF-7728103FB235}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1802CCF4-AEAA-4B9F-81EF-7728103FB235}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1802CCF4-AEAA-4B9F-81EF-7728103FB235}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1802CCF4-AEAA-4B9F-81EF-7728103FB235}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5B436124-4020-4F0E-9771-8F2728906494} = {3826ACF2-CD64-483E-94E3-077AA7BD6CE7}
+		{CA946474-BF52-4FE8-89E7-BD2185D3CF5C} = {5B436124-4020-4F0E-9771-8F2728906494}
+		{1802CCF4-AEAA-4B9F-81EF-7728103FB235} = {CA946474-BF52-4FE8-89E7-BD2185D3CF5C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {949B7BA9-2005-426C-B9A1-562B06972FA5}

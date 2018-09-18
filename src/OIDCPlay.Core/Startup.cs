@@ -61,7 +61,7 @@ namespace OIDCPlay.Core
             if (!(string.IsNullOrEmpty(Configuration["Norton-ClientId"]) ||
                  string.IsNullOrEmpty(Configuration["Norton-ClientSecret"])))
             {
-                authenticationBuilder.AddOpenIdConnect(NortonDefaults.AuthenticationScheme, NortonDefaults.DisplayName,
+                authenticationBuilder.P7AddOpenIdConnect(NortonDefaults.AuthenticationScheme, NortonDefaults.DisplayName,
                     o =>
                     {
                         var openIdConnectOptions = new NortonOpenIdConnectOptions();
@@ -75,7 +75,7 @@ namespace OIDCPlay.Core
                         o.GetClaimsFromUserInfoEndpoint = openIdConnectOptions.GetClaimsFromUserInfoEndpoint;
                         o.SaveTokens = openIdConnectOptions.SaveTokens;
                         o.Scope.Add("offline_access");
-                        o.Events = new OpenIdConnectEvents()
+                        o.Events = new P7.AspNetCore.Authentication.OpenIdConnect.OpenIdConnectEvents()
                         {
                             OnMessageReceived = (context) =>
                             {
@@ -159,7 +159,7 @@ namespace OIDCPlay.Core
             if (!(string.IsNullOrEmpty(Configuration["Google-ClientId"]) ||
                   string.IsNullOrEmpty(Configuration["Google-ClientSecret"])))
             {
-                authenticationBuilder.AddOpenIdConnect(GoogleDefaults.AuthenticationScheme, GoogleDefaults.DisplayName,
+                authenticationBuilder.P7AddOpenIdConnect(GoogleDefaults.AuthenticationScheme, GoogleDefaults.DisplayName,
                       o =>
                       {
                           var openIdConnectOptions = new GoogleOpenIdConnectOptions();
@@ -173,7 +173,7 @@ namespace OIDCPlay.Core
                           o.GetClaimsFromUserInfoEndpoint = openIdConnectOptions.GetClaimsFromUserInfoEndpoint;
                           o.SaveTokens = openIdConnectOptions.SaveTokens;
 
-                          o.Events = new OpenIdConnectEvents()
+                          o.Events = new P7.AspNetCore.Authentication.OpenIdConnect.OpenIdConnectEvents()
                           {
                               OnMessageReceived = (context) =>
                               {

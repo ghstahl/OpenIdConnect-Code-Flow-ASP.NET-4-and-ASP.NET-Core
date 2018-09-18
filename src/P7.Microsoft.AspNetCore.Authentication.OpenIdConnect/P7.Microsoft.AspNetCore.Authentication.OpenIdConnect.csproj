@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>ASP.NET Core middleware that enables an application to support the OpenID Connect authentication workflow.</Description>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageTags>aspnetcore;authentication;security</PackageTags>
+    <RootNamespace>Microsoft.AspNetCore.Authentication.OpenIdConnect</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OAuth" Version="2.1.1" />
+    <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="5.2.4" />
+  </ItemGroup>
+
+</Project>
