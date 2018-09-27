@@ -5,5 +5,29 @@
 }
 <h2>@ViewData["Title"]</h2>
 <h3>@Model.Message</h3>
-
 <p>Use this area to provide additional information.</p>
+
+<div class="row">
+    <div class="col-md-12">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <td class="no-wrap">Key</td>
+                <td>Value</td>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var item in Model.OIDC)
+            {
+                <tr>
+                    <td>@item.Key</td>
+                    <td>
+                        <textarea readonly rows="4" cols="100">@(string.IsNullOrEmpty(item.Value) ? "NA" : item.Value)</textarea>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+
+</div>
