@@ -3,12 +3,18 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+
 
 namespace OIDCPlay.Core.Areas.Identity.Pages.Account
 {
@@ -18,8 +24,9 @@ namespace OIDCPlay.Core.Areas.Identity.Pages.Account
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly ILogger<ExternalLoginModel> _logger;
-
+        IDataProtector _protector;
         public ExternalLoginModel(
+            IDataProtectionProvider provider,
             SignInManager<IdentityUser> signInManager,
             UserManager<IdentityUser> userManager,
             ILogger<ExternalLoginModel> logger)
@@ -27,13 +34,14 @@ namespace OIDCPlay.Core.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _userManager = userManager;
             _logger = logger;
+            _protector = provider.CreateProtector("OIDCPlay.Core.io");
         }
 
         [BindProperty]
         public InputModel Input { get; set; }
 
         public string LoginProvider { get; set; }
-
+        public ISecureDataFormat<string> StringDataFormat { get; set; }
         public string ReturnUrl { get; set; }
 
         [TempData]
@@ -78,6 +86,15 @@ namespace OIDCPlay.Core.Areas.Identity.Pages.Account
                 ErrorMessage = "Error loading external login information.";
                 return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
             }
+            var oidc = await HarvestOidcDataAsync();
+            var cookieValue = JsonConvert.SerializeObject(oidc);
+            string protectedPayload = _protector.Protect(cookieValue);
+
+            var cookieOptions = new CookieOptions
+            {
+                Expires = DateTime.Now.AddDays(30)
+            };
+            Response.Cookies.Append("oidc", protectedPayload, cookieOptions);
 
             // Sign in the user with this external login provider if the user already has a login.
             var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor : true);
@@ -140,6 +157,24 @@ namespace OIDCPlay.Core.Areas.Identity.Pages.Account
             LoginProvider = info.LoginProvider;
             ReturnUrl = returnUrl;
             return Page();
+        }
+        private async Task<Dictionary<string, string>> HarvestOidcDataAsync()
+        {
+            var at = await HttpContext.GetTokenAsync(IdentityConstants.ExternalScheme, "access_token");
+            var idt = await HttpContext.GetTokenAsync(IdentityConstants.ExternalScheme, "id_token");
+            var rt = await HttpContext.GetTokenAsync(IdentityConstants.ExternalScheme, "refresh_token");
+            var tt = await HttpContext.GetTokenAsync(IdentityConstants.ExternalScheme, "token_type");
+            var ea = await HttpContext.GetTokenAsync(IdentityConstants.ExternalScheme, "expires_at");
+
+            var oidc = new Dictionary<string, string>
+            {
+                {"access_token", at},
+                {"id_token", idt},
+                {"refresh_token", rt},
+                {"token_type", tt},
+                {"expires_at", ea}
+            };
+            return oidc;
         }
     }
 }
