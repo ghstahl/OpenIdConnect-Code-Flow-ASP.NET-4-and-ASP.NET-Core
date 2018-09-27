@@ -21,10 +21,15 @@
                             
                             <div class="form-group">
                                 <input asp-for="@Model.NortonViewModel.AcrViewModels[i].Name" type="hidden" />
+                                <input asp-for="@Model.NortonViewModel.AcrViewModels[i].HasArgument" type="hidden" />
                                 <div class="checkbox">
                                     <label asp-for="@Model.NortonViewModel.AcrViewModels[i].Checked">
-                                        <input asp-for="@Model.NortonViewModel.AcrViewModels[i].Checked"/>
+                                        <input asp-for="@Model.NortonViewModel.AcrViewModels[i].Checked" />
                                         @Model.NortonViewModel.AcrViewModels[i].Name
+                                        @if (Model.NortonViewModel.AcrViewModels[i].HasArgument)
+                                        {
+                                            <input asp-for="@Model.NortonViewModel.AcrViewModels[i].Argument" />
+                                        }
                                     </label>
                                 </div>
                             </div>

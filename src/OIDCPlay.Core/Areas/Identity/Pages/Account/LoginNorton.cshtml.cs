@@ -19,6 +19,8 @@ namespace OIDCPlay.Core.Areas.Identity.Pages.Account
     {
         public string Name { get; set; }
         public bool Checked { get; set; }
+        public bool HasArgument { get; set; }
+        public string Argument { get; set; }
     }
 
     public class NortonViewModel
@@ -80,7 +82,7 @@ namespace OIDCPlay.Core.Areas.Identity.Pages.Account
             ReturnUrl = returnUrl;
 
             var query = from item in OAuth2SchemeRecords
-                        where item.Scheme == "Norton"
+                where item.Scheme == "Norton"
                 select item;
             var nortonRecord = query.FirstOrDefault();
             NortonViewModel = new NortonViewModel {AcrViewModels = new List<AcrViewModel>()};
@@ -88,7 +90,9 @@ namespace OIDCPlay.Core.Areas.Identity.Pages.Account
             {
                 NortonViewModel.AcrViewModels.Add(new AcrViewModel()
                 {
-                    Name = acrValue,Checked = false
+                    Name = acrValue,
+                    Checked = false,
+                    HasArgument = acrValue.Contains("{arg}")
                 });
             }
         }
