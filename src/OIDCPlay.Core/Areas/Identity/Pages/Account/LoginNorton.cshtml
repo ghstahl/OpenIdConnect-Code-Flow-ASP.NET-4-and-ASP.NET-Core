@@ -1,0 +1,47 @@
+﻿@page
+@model LoginNortonModel
+
+@{
+    ViewData["Title"] = "Log in Norton";
+}
+
+<h2>@ViewData["Title"]</h2>
+<div class="row">
+    <div class="col-md-12">
+        <section>
+            <form method="post">
+                <h4>Acr Values.</h4>
+                <hr />
+                <div asp-validation-summary="All" class="text-danger"></div>
+                <ul class="list-group">
+                    @for (int i = 0; i < Model.NortonViewModel.AcrViewModels.Count; i++)
+                    {
+
+                        <li class="list-group-item">
+                            
+                            <div class="form-group">
+                                <input asp-for="@Model.NortonViewModel.AcrViewModels[i].Name" type="hidden" />
+                                <div class="checkbox">
+                                    <label asp-for="@Model.NortonViewModel.AcrViewModels[i].Checked">
+                                        <input asp-for="@Model.NortonViewModel.AcrViewModels[i].Checked"/>
+                                        @Model.NortonViewModel.AcrViewModels[i].Name
+                                    </label>
+                                </div>
+                            </div>
+                        </li>
+                    }
+                </ul>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-default">Log in</button>
+                </div>
+
+            </form>
+        </section>
+    </div>
+  
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

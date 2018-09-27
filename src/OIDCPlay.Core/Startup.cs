@@ -16,6 +16,8 @@ using OIDCPlay.Core.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Newtonsoft.Json;
+using OIDCPlay.Core.Areas.Identity.Pages.Account;
 
 namespace OIDCPlay.Core
 {
@@ -103,8 +105,24 @@ namespace OIDCPlay.Core
                             },
                             OnRedirectToIdentityProvider = (context) =>
                             {
+                                //"AcrViewModels"
+                                if (context.Request.Cookies.ContainsKey("AcrViewModels"))
+                                {
+                                    var json = context.Request.Cookies["AcrViewModels"];
+                                    var acrViewModels = JsonConvert.DeserializeObject<List<AcrViewModel>>(json);
+                                    var queryAcrValues = from item in acrViewModels
+                                        where item.Checked
+                                        let c = $"{item.Name}"
+                                        select c;
 
-                                var acrValues = context.ProtocolMessage.AcrValues;
+                                    var acrValues = "";
+                                    foreach (var v in queryAcrValues)
+                                    {
+                                        acrValues += $"{v} ";
+                                    }
+                                    context.ProtocolMessage.AcrValues = acrValues.TrimEnd();
+                                }
+
                                 context.ProtocolMessage.Scope += " open_web_session";
                                 if (context.HttpContext.User.Identity.IsAuthenticated)
                                 {

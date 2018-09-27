@@ -21,5 +21,6 @@ namespace OIDCPlay.Core
         public string Authority { get; set; }
         public string CallbackPath { get; set; }
         public List<string> AdditionalEndpointBaseAddresses { get; set; }
+        public List<string> AcrValues { get; set; }
     }
 }

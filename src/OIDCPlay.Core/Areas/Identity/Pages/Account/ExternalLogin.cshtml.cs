@@ -59,6 +59,11 @@ namespace OIDCPlay.Core.Areas.Identity.Pages.Account
             return new ChallengeResult(provider, properties);
         }
 
+        public async Task<IActionResult> OnGetProviderAsync(string provider, string returnUrl = null)
+        {
+             return OnPost(provider, returnUrl);
+        }
+
         public async Task<IActionResult> OnGetCallbackAsync(string returnUrl = null, string remoteError = null)
         {
             returnUrl = returnUrl ?? Url.Content("~/");
