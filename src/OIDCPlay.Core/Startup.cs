@@ -105,12 +105,12 @@ namespace OIDCPlay.Core
                             OnRedirectToIdentityProvider = (context) =>
                             {
                                 //"AcrViewModels"
-                                if (context.Request.Cookies.ContainsKey("AcrViewModels"))
+                                if (context.Request.Cookies.ContainsKey("OptionModels"))
                                 {
-                                    var json = context.Request.Cookies["AcrViewModels"];
-                                    var acrViewModels = JsonConvert.DeserializeObject<List<AcrViewModel>>(json);
+                                    var json = context.Request.Cookies["OptionModels"];
+                                    var acrViewModels = JsonConvert.DeserializeObject<List<OptionModel>>(json);
                                     var queryAcrValues = from item in acrViewModels
-                                        where item.Checked
+                                        where item.Checked && item.OptionType == OptionType.OptionType_ACR_VALUE
                                         select item;
 
                                     var acrValues = "";
@@ -128,6 +128,15 @@ namespace OIDCPlay.Core
                                     }
 
                                     context.ProtocolMessage.AcrValues = acrValues.TrimEnd();
+
+                                    var optionLoginPrompt = (from item in acrViewModels
+                                        where item.Checked && item.OptionType == OptionType.OptionType_LOGIN_PROMPT
+                                        select item).FirstOrDefault();
+                                    if (optionLoginPrompt != null && optionLoginPrompt.Checked)
+                                    {
+                                        context.ProtocolMessage.Prompt = "login";
+                                    }
+
                                 }
 
                                 context.ProtocolMessage.Scope += " open_web_session";

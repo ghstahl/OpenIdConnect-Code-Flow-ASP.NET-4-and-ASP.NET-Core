@@ -15,8 +15,14 @@ using Newtonsoft.Json;
 
 namespace OIDCPlay.Core.Areas.Identity.Pages.Account
 {
-    public class AcrViewModel
+    public enum OptionType
     {
+        OptionType_ACR_VALUE,
+        OptionType_LOGIN_PROMPT
+    }
+    public class OptionModel
+    {
+        public OptionType OptionType { get; set; }
         public string Name { get; set; }
         public bool Checked { get; set; }
         public bool HasArgument { get; set; }
@@ -25,7 +31,7 @@ namespace OIDCPlay.Core.Areas.Identity.Pages.Account
 
     public class NortonViewModel
     {
-        public List<AcrViewModel> AcrViewModels { get; set; }
+        public List<OptionModel> OptionModels { get; set; }
     }
     [AllowAnonymous]
     public class LoginNortonModel : PageModel
@@ -85,16 +91,24 @@ namespace OIDCPlay.Core.Areas.Identity.Pages.Account
                 where item.Scheme == "Norton"
                 select item;
             var nortonRecord = query.FirstOrDefault();
-            NortonViewModel = new NortonViewModel {AcrViewModels = new List<AcrViewModel>()};
+            NortonViewModel = new NortonViewModel { OptionModels = new List<OptionModel>()};
             foreach (var acrValue in nortonRecord.AcrValues)
             {
-                NortonViewModel.AcrViewModels.Add(new AcrViewModel()
+                NortonViewModel.OptionModels.Add(new OptionModel()
                 {
+                    OptionType = OptionType.OptionType_ACR_VALUE,
                     Name = acrValue,
                     Checked = false,
                     HasArgument = acrValue.Contains("{arg}")
                 });
             }
+            NortonViewModel.OptionModels.Add(new OptionModel()
+            {
+                OptionType = OptionType.OptionType_LOGIN_PROMPT,
+                Name = "Login Prompt",
+                Checked = false,
+                HasArgument = false
+            });
         }
 
         public async Task<IActionResult> OnPostAsync(string localReturnUrl = null)
@@ -103,12 +117,12 @@ namespace OIDCPlay.Core.Areas.Identity.Pages.Account
 
             if (ModelState.IsValid)
             {
-                var cookieValue = JsonConvert.SerializeObject(NortonViewModel.AcrViewModels);
+                var cookieValue = JsonConvert.SerializeObject(NortonViewModel.OptionModels);
                 var cookieOptions = new CookieOptions
                 {
                     Expires = DateTime.Now.AddDays(30)
                 };
-                Response.Cookies.Append("AcrViewModels", cookieValue, cookieOptions);
+                Response.Cookies.Append("OptionModels", cookieValue, cookieOptions);
 
                 return RedirectToPage("ExternalLogin", "Provider", new { provider = "Norton", returnUrl = localReturnUrl });
                 

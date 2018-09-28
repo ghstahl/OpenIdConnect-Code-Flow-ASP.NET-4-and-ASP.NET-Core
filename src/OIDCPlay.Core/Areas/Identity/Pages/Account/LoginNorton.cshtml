@@ -14,21 +14,22 @@
                 <hr />
                 <div asp-validation-summary="All" class="text-danger"></div>
                 <ul class="list-group">
-                    @for (int i = 0; i < Model.NortonViewModel.AcrViewModels.Count; i++)
+                    @for (int i = 0; i < Model.NortonViewModel.OptionModels.Count; i++)
                     {
 
                         <li class="list-group-item">
                             
                             <div class="form-group">
-                                <input asp-for="@Model.NortonViewModel.AcrViewModels[i].Name" type="hidden" />
-                                <input asp-for="@Model.NortonViewModel.AcrViewModels[i].HasArgument" type="hidden" />
+                                <input asp-for="@Model.NortonViewModel.OptionModels[i].OptionType" type="hidden" />
+                                <input asp-for="@Model.NortonViewModel.OptionModels[i].Name" type="hidden"/>
+                                <input asp-for="@Model.NortonViewModel.OptionModels[i].HasArgument" type="hidden"/>
                                 <div class="checkbox">
-                                    <label asp-for="@Model.NortonViewModel.AcrViewModels[i].Checked">
-                                        <input asp-for="@Model.NortonViewModel.AcrViewModels[i].Checked" />
-                                        @Model.NortonViewModel.AcrViewModels[i].Name
-                                        @if (Model.NortonViewModel.AcrViewModels[i].HasArgument)
+                                    <label asp-for="@Model.NortonViewModel.OptionModels[i].Checked">
+                                        <input asp-for="@Model.NortonViewModel.OptionModels[i].Checked"/>
+                                        @Model.NortonViewModel.OptionModels[i].Name
+                                        @if (Model.NortonViewModel.OptionModels[i].HasArgument)
                                         {
-                                            <input asp-for="@Model.NortonViewModel.AcrViewModels[i].Argument" />
+                                            <input asp-for="@Model.NortonViewModel.OptionModels[i].Argument"/>
                                         }
                                     </label>
                                 </div>
