@@ -19,6 +19,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2.1.1", "2.1.1", "{CA946474
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "P7.Microsoft.AspNetCore.Authentication.OpenIdConnect", "P7.Microsoft.AspNetCore.Authentication.OpenIdConnect\P7.Microsoft.AspNetCore.Authentication.OpenIdConnect.csproj", "{1802CCF4-AEAA-4B9F-81EF-7728103FB235}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".vs", ".vs", "{AACB504C-C06C-421D-8FFE-20C47CF07B51}"
+	ProjectSection(SolutionItems) = preProject
+		.vs\config\applicationhost.config = .vs\config\applicationhost.config
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
