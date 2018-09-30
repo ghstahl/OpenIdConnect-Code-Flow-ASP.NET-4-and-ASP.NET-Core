@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
@@ -67,12 +68,13 @@ namespace OIDCPlay.Core.Pages
             Message = "Your application description page.";
             if (User.Identity.IsAuthenticated)
             {
-                if (Request.Cookies.ContainsKey("oidc"))
+                byte[] oidcStored = null;
+                HttpContext.Session.TryGetValue("oidc", out oidcStored);
+
+                if (oidcStored != null)
                 {
-                    var protectedPayload = Request.Cookies["oidc"];
-                    // unprotect the payload
-                    string unprotectedPayload = _protector.Unprotect(protectedPayload);
-                    OIDC = JsonConvert.DeserializeObject<Dictionary<string,string>>(unprotectedPayload);
+                    string oidcJson = Encoding.ASCII.GetString(oidcStored);
+                    OIDC = JsonConvert.DeserializeObject<Dictionary<string,string>>(oidcJson);
                     var decodedDictionary = new Dictionary<string,string>();
                     foreach (var item in OIDC)
                     {

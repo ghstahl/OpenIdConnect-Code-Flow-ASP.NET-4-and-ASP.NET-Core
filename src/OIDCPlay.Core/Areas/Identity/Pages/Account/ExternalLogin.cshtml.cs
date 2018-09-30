@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -88,14 +89,10 @@ namespace OIDCPlay.Core.Areas.Identity.Pages.Account
             }
             var oidc = await HarvestOidcDataAsync();
             var cookieValue = JsonConvert.SerializeObject(oidc);
-            string protectedPayload = _protector.Protect(cookieValue);
 
-            var cookieOptions = new CookieOptions
-            {
-                Expires = DateTime.Now.AddDays(30)
-            };
-            Response.Cookies.Append("oidc", protectedPayload, cookieOptions);
-
+            byte[] bytes = Encoding.ASCII.GetBytes(cookieValue);
+            HttpContext.Session.Set("oidc", bytes); 
+          
             // Sign in the user with this external login provider if the user already has a login.
             var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor : true);
             if (result.Succeeded)
