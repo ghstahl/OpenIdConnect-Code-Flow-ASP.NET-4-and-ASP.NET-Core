@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
- using InMemoryIdenity.ForSingleExternalAuthOnly;
+using System.Web;
+using System.Web.Mvc;
+using InMemoryIdenity.ForSingleExternalAuthOnly;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
@@ -12,6 +16,7 @@ using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.OpenIdConnect;
+using Newtonsoft.Json;
 using Owin;
 using OIDCPlay.Models;
 
@@ -127,6 +132,15 @@ namespace OIDCPlay
                         var idToken = ticket.Properties.GetTokenValue("id_token");
                         var accessToken = ticket.Properties.GetTokenValue("access_token");
                         var refreshToken = ticket.Properties.GetTokenValue("refresh_token");
+
+                        var httpContext = DependencyResolver.Current.GetService<HttpContext>();
+                        Dictionary<string, string> oidc = new Dictionary<string, string>
+                        {
+                            {"id_token", idToken},
+                            { "access_token", accessToken},
+                            { "refresh_token", refreshToken}
+                        };
+                        httpContext.Session.Add("oidc", oidc);
                     },
                     RedirectToIdentityProvider = async n =>
                     {
