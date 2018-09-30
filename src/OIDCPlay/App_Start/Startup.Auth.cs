@@ -105,6 +105,15 @@ namespace OIDCPlay
                         var idToken = ticket.Properties.GetTokenValue("id_token");
                         var accessToken = ticket.Properties.GetTokenValue("access_token");
                         var refreshToken = ticket.Properties.GetTokenValue("refresh_token");
+
+                        var httpContext = DependencyResolver.Current.GetService<HttpContext>();
+                        Dictionary<string, string> oidc = new Dictionary<string, string>
+                        {
+                            {"id_token", idToken},
+                            { "access_token", accessToken},
+                            { "refresh_token", refreshToken}
+                        };
+                        httpContext.Session.Add("oidc", oidc);
                     }
                 }
             });
