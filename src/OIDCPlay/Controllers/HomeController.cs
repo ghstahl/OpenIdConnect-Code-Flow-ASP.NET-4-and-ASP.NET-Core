@@ -67,21 +67,6 @@ namespace OIDCPlay.Controllers
         {
             ViewBag.Message = "Your application description page.";
             var oidc = Session["oidc"] as Dictionary<string, string>;
-            var decodedDictionary = new Dictionary<string, string>();
-            foreach (var item in oidc)
-            {
-                var decodedItem = DecodeJwt(item.Value);
-                if (!string.IsNullOrEmpty(decodedItem))
-                {
-                    decodedDictionary.Add($"{item.Key}.decoded", decodedItem);
-                }
-            }
-
-            foreach (var item in decodedDictionary)
-            {
-                oidc.Add(item.Key, item.Value);
-            }
-
             return View(new AboutModel()
             {
                 OIDC = oidc

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication;
@@ -117,13 +118,10 @@ namespace OIDCPlay.Core.Areas.Identity.Pages.Account
 
             if (ModelState.IsValid)
             {
-                var cookieValue = JsonConvert.SerializeObject(NortonViewModel.OptionModels);
-                var cookieOptions = new CookieOptions
-                {
-                    Expires = DateTime.Now.AddDays(30)
-                };
-                Response.Cookies.Append("OptionModels", cookieValue, cookieOptions);
 
+                var cookieValue = JsonConvert.SerializeObject(NortonViewModel.OptionModels);
+                byte[] bytes = Encoding.ASCII.GetBytes(cookieValue);
+                HttpContext.Session.Set("oidc.norton.options", bytes);
                 return RedirectToPage("ExternalLogin", "Provider", new { provider = "Norton", returnUrl = localReturnUrl });
                 
                 // This doesn't count login failures towards account lockout

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -113,10 +114,15 @@ namespace OIDCPlay.Core
                             OnRedirectToIdentityProvider = (context) =>
                             {
                                 //"AcrViewModels"
-                                if (context.Request.Cookies.ContainsKey("OptionModels"))
+
+                                byte[] oidcNortonOptions = null;
+                                context.HttpContext.Session.TryGetValue("oidc.norton.options", out oidcNortonOptions);
+
+                                if (oidcNortonOptions != null)
                                 {
-                                    var json = context.Request.Cookies["OptionModels"];
-                                    var acrViewModels = JsonConvert.DeserializeObject<List<OptionModel>>(json);
+                                    string oidcNortonOptionsJson = Encoding.ASCII.GetString(oidcNortonOptions);
+                                
+                                    var acrViewModels = JsonConvert.DeserializeObject<List<OptionModel>>(oidcNortonOptionsJson);
                                     var queryAcrValues = from item in acrViewModels
                                         where item.Checked && item.OptionType == OptionType.OptionType_ACR_VALUE
                                         select item;

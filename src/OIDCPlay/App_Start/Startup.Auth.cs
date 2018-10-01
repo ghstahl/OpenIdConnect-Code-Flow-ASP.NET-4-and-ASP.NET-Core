@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -17,6 +18,7 @@ using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.OpenIdConnect;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Owin;
 using OIDCPlay.Models;
 
@@ -24,7 +26,44 @@ namespace OIDCPlay
 {
     public partial class Startup
     {
- 
+        private static string DecodeJwt(string jwtToken)
+        {
+            var jwtHandler = new JwtSecurityTokenHandler();
+            //Check if readable token (string is in a JWT format)
+            var readableToken = jwtHandler.CanReadToken(jwtToken);
+            if (readableToken != true)
+            {
+                return null;
+            }
+            else
+            {
+                var token = jwtHandler.ReadJwtToken(jwtToken);
+
+                //Extract the headers of the JWT
+                var headers = token.Header;
+                var jwtHeader = "{";
+                foreach (var h in headers)
+                {
+                    jwtHeader += '"' + h.Key + "\":\"" + h.Value + "\",";
+                }
+                jwtHeader += "}";
+                var jwtIdToken = "Header:\r\n" + JToken.Parse(jwtHeader).ToString(Formatting.Indented);
+
+                //Extract the payload of the JWT
+                var claims = token.Claims;
+                var jwtPayload = "{";
+                foreach (Claim c in claims)
+                {
+                    jwtPayload += '"' + c.Type + "\":\"" + c.Value + "\",";
+                }
+                jwtPayload += "}";
+                jwtIdToken += "\r\nPayload:\r\n" + JToken.Parse(jwtPayload).ToString(Formatting.Indented);
+
+
+                return jwtIdToken;
+            }
+
+        }
         // For more information on configuring authentication, please visit https://go.microsoft.com/fwlink/?LinkId=301864
         public void ConfigureAuth(IAppBuilder app)
         {
@@ -113,6 +152,19 @@ namespace OIDCPlay
                             { "access_token", accessToken},
                             { "refresh_token", refreshToken}
                         };
+                        var decodedDictionary = new Dictionary<string, string>();
+                        foreach (var item in oidc)
+                        {
+                            var decodedItem = DecodeJwt(item.Value);
+                            if (!string.IsNullOrEmpty(decodedItem))
+                            {
+                                decodedDictionary.Add($"{item.Key}.decoded", decodedItem);
+                            }
+                        }
+                        foreach (var item in decodedDictionary)
+                        {
+                            oidc.Add(item.Key, item.Value);
+                        }
                         httpContext.Session.Add("oidc", oidc);
                     }
                 }
@@ -149,6 +201,19 @@ namespace OIDCPlay
                             { "access_token", accessToken},
                             { "refresh_token", refreshToken}
                         };
+                        var decodedDictionary = new Dictionary<string, string>();
+                        foreach (var item in oidc)
+                        {
+                            var decodedItem = DecodeJwt(item.Value);
+                            if (!string.IsNullOrEmpty(decodedItem))
+                            {
+                                decodedDictionary.Add($"{item.Key}.decoded", decodedItem);
+                            }
+                        }
+                        foreach (var item in decodedDictionary)
+                        {
+                            oidc.Add(item.Key, item.Value);
+                        }
                         httpContext.Session.Add("oidc", oidc);
                     },
                     RedirectToIdentityProvider = async n =>
