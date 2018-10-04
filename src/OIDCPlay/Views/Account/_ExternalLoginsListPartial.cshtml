@@ -22,7 +22,12 @@
                     {
                         if (p.AuthenticationType == "Norton")
                         {
-                            <input type="button" class="btn btn-info" value="Norton" onclick="location.href = '/Account/LoginNorton';">
+                            var href = "/Account/LoginNorton";
+                            if (!string.IsNullOrEmpty(Model.ReturnUrl))
+                            {
+                                href += $"?returnUrl={Model.ReturnUrl}";
+                            }
+                            <input type="button" class="btn btn-info" value="Norton" onclick="location.href = '@href'">
                         
                         }
                         else
