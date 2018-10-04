@@ -1,0 +1,55 @@
+﻿@using OIDCPlay.Models
+@model NortonViewModel
+@{
+    ViewBag.Title = "Log in Norton";
+}
+
+<h2>@ViewBag.Title.</h2>
+<div class="row">
+    <div class="col-md-12">
+        <section>
+            @using (Html.BeginForm("LoginNorton", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+            {
+                <h4>Acr Values.</h4>
+                <hr />
+                @Html.AntiForgeryToken()
+                <ul class="list-group">
+                    @for (int i = 0; i < Model.OptionModels.Count; i++)
+                    {
+
+                        <li class="list-group-item">
+                            <div class="form-group">
+                                @Html.TextBoxFor(m => m.OptionModels[i].Key, new { @Type = "hidden" })
+                                @Html.TextBoxFor(m => m.OptionModels[i].OptionType, new {@Type = "hidden"})
+                                @Html.TextBoxFor(m => m.OptionModels[i].Name, new {@Type = "hidden"})
+                                @Html.TextBoxFor(m => m.OptionModels[i].HasArgument, new {@Type = "hidden"})
+
+                                <div class="checkbox">
+                                    <label>
+                                        @Html.CheckBoxFor(m => m.OptionModels[i].Checked) @Model.OptionModels[i].Name
+                                        @if (Model.OptionModels[i].HasArgument)
+                                        {
+                                            @Html.TextBoxFor(m => m.OptionModels[i].Argument)
+                                        }
+                                    </label>
+                                </div>
+                            </div>
+                        </li>
+
+                    }
+                </ul>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-default">Log in</button>
+                </div>
+            }
+
+
+        </section>
+    </div>
+
+</div>
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

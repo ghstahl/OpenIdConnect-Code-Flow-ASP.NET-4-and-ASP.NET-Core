@@ -69,8 +69,8 @@ namespace OIDCPlay.Core
                     options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
                 }).AddCookie();
 
-            if (!(string.IsNullOrEmpty(Configuration["Norton-ClientId"]) ||
-                  string.IsNullOrEmpty(Configuration["Norton-ClientSecret"])))
+            if (!(string.IsNullOrEmpty(Configuration["Norton-ClientId-Two"]) ||
+                  string.IsNullOrEmpty(Configuration["Norton-ClientSecret-Two"])))
             {
                 authenticationBuilder.P7AddOpenIdConnect(NortonDefaults.AuthenticationScheme,
                     NortonDefaults.DisplayName,

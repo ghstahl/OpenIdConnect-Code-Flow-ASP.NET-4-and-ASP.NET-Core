@@ -20,3 +20,7 @@
 textarea {
     resize: none;
 }
+.form-horizontal .form-group {
+    margin-right: -15px;
+    margin-left: 0px;
+}

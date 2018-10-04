@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using Microsoft.Owin.Extensions;
 using Microsoft.Owin.Security.OpenIdConnect;
 
 namespace Owin
@@ -47,7 +48,8 @@ namespace Owin
         /// <param name="app">The <see cref="IAppBuilder"/> passed to the configuration method</param>
         /// <param name="openIdConnectOptions">A <see cref="OpenIdConnectAuthenticationOptions"/> contains settings for obtaining identities using the OpenIdConnect protocol.</param>
         /// <returns>The updated <see cref="IAppBuilder"/></returns>
-        public static IAppBuilder UseOpenIdConnectAuthentication(this IAppBuilder app, OpenIdConnectAuthenticationOptions openIdConnectOptions)
+        public static IAppBuilder UseOpenIdConnectAuthentication(this IAppBuilder app,
+            OpenIdConnectAuthenticationOptions openIdConnectOptions)
         {
             if (app == null)
             {
@@ -59,7 +61,9 @@ namespace Owin
                 throw new ArgumentNullException("openIdConnectOptions");
             }
 
-            return app.Use(typeof(OpenIdConnectAuthenticationMiddleware), app, openIdConnectOptions);
+            app.Use(typeof(OpenIdConnectAuthenticationMiddleware), app, openIdConnectOptions);
+            app.UseStageMarker(PipelineStage.PostAcquireState);
+            return app;
         }
     }
 }

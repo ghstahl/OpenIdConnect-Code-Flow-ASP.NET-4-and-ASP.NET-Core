@@ -1,26 +1,96 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using InMemoryIdenity.ForSingleExternalAuthOnly;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Owin.Security;
+using Newtonsoft.Json;
 using OIDCPlay.Models;
 
 namespace OIDCPlay.Controllers
 {
+    public class NortonLoginRedirectOptionsStore
+    {
+        private IConfiguration _configuration;
+        private List<OAuth2SchemeRecord> _oAuth2SchemeRecords;
+        private List<OAuth2SchemeRecord> OAuth2SchemeRecords
+        {
+            get
+            {
+                if (_oAuth2SchemeRecords == null)
+                {
+                    var section = _configuration.GetSection("oauth2");
+                    _oAuth2SchemeRecords = new List<OAuth2SchemeRecord>();
+                    section.Bind(_oAuth2SchemeRecords);
+                }
+                return _oAuth2SchemeRecords;
+            }
+        }
+        public NortonLoginRedirectOptionsStore(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
+        private List<OptionModel> _optionModels;
+        public List<OptionModel> OptionModels => _optionModels ?? (_optionModels = BuildNortonOptionModels());
+
+        public OptionModel GetOptionModelByKey(string key)
+        {
+            var query = from item in OptionModels
+                where item.Key == key
+                select item;
+            return query.FirstOrDefault();
+        }
+        List<OptionModel> BuildNortonOptionModels()
+        {
+            var query = from item in OAuth2SchemeRecords
+                where item.Scheme == "Norton"
+                select item;
+            var optionModels = new List<OptionModel>();
+            var nortonRecord = query.FirstOrDefault();
+         
+            foreach (var acrValue in nortonRecord.AcrValues)
+            {
+                optionModels.Add(new OptionModel()
+                {
+                    OptionType = OptionType.OptionType_ACR_VALUE,
+                    Name = acrValue,
+                    Checked = false,
+                    HasArgument = acrValue.Contains("{arg}")
+                });
+            }
+            optionModels.Add(new OptionModel()
+            {
+                OptionType = OptionType.OptionType_LOGIN_PROMPT,
+                Name = "Login Prompt",
+                Checked = false,
+                HasArgument = false
+            });
+            foreach (var optionModel in optionModels)
+            {
+                optionModel.Key = optionModel.Name.GetHashCode().ToString();
+            }
+            return optionModels;
+        }
+    }
     [Authorize]
     public class AccountController : Controller
     {
         private CustomSignInManager _signInManager;
         private CustomUserManager _userManager;
 
-        public AccountController()
+        public NortonLoginRedirectOptionsStore NortonLoginRedirectOptionsStore { get; }
+        public AccountController(NortonLoginRedirectOptionsStore nortonLoginRedirectOptionsStore)
         {
+            NortonLoginRedirectOptionsStore = nortonLoginRedirectOptionsStore;
         }
 
         public AccountController(CustomUserManager userManager, CustomSignInManager signInManager )
@@ -63,7 +133,58 @@ namespace OIDCPlay.Controllers
 
             return View();
         }
- 
+
+        NortonViewModel BuildNortonViewModel()
+        {
+            var nortonViewModel = new NortonViewModel { OptionModels = NortonLoginRedirectOptionsStore.OptionModels };
+            return nortonViewModel;
+        }
+        //
+        // GET: /Account/Login
+        [AllowAnonymous]
+        public ActionResult LoginNorton(string returnUrl)
+        {
+            ViewBag.ReturnUrl = returnUrl;
+            return View(BuildNortonViewModel());
+        }
+
+        //
+        // POST: /Account/Login
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> LoginNorton(NortonViewModel model, string returnUrl)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var query = from item in model.OptionModels
+                where item.Checked == true
+                select item;
+            var trimmedList = query.ToList();
+            if (trimmedList.Count > 0)
+            {
+                var cookieValue = JsonConvert.SerializeObject(trimmedList);
+                Session.Add("oidc.norton.options", cookieValue);
+                Response.Cookies.Add(new HttpCookie("oidc.norton.options", cookieValue)
+                {
+                    Expires = DateTime.Now.AddMinutes(30)
+                });
+            }
+            else
+            {
+                Session.Remove("oidc.norton.options");
+                Response.Cookies.Add(new HttpCookie("oidc.norton.options", "")
+                {
+                    Expires = DateTime.Now.AddMinutes(-30)
+                });
+            }
+           
+            return ExternalLogin("Norton", returnUrl);
+        }
+
         //
         // POST: /Account/ExternalLogin
         [HttpPost]
@@ -217,6 +338,8 @@ namespace OIDCPlay.Controllers
                 return HttpContext.GetOwinContext().Authentication;
             }
         }
+
+       
 
         private void AddErrors(IdentityResult result)
         {
